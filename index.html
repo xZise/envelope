@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Envelope Designer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Envelope Designer</h1>
+  <form id="envelopeForm">
+    <label>
+      Width (mm):
+      <input type="number" id="width" required>
+    </label>
+    <label>
+      Height (mm):
+      <input type="number" id="height" required>
+    </label>
+    <button type="submit">Generate</button>
+  </form>
+
+  <div id="svgContainer"></div>
+
+  <script src="envelope.js" type="module"></script>
+</body>
+</html>
