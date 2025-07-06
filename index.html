@@ -17,10 +17,19 @@
       Height (mm):
       <input type="number" id="height" required>
     </label>
+    <label>
+      Depth (mm):
+      <input type="number" id="depth" required>
+    </label>
     <button type="submit">Generate</button>
   </form>
 
-  <div id="svgContainer"></div>
+  <div id="result">
+    <div>Papersize: <span id="paperSize"></span> mm</div>
+    <div>Score line 1: <span id="score1"></span> mm</div>
+    <div>Score line 2: <span id="score2"></span> mm</div>
+    <div id="svgContainer"></div>
+  </div>
 
   <script src="envelope.js" type="module"></script>
 </body>
