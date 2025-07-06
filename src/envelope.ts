@@ -2,49 +2,40 @@ function mmToPx(mm: number): number {
   return mm * 3.78; // Rough conversion
 }
 
-function createEnvelopeSVG(width: number, height: number): string {
-  const margin = 5;
-  const sideFlap = width / 3;
-  const topFlap = height * 0.4;
-  const bottomFlap = height * 0.6;
+function createPath(totalWidth: number, score: number, offsetBoard: number): string {
+  const scorePosOffset = score + offsetBoard
+  const scoreNegOffset = score - offsetBoard
+  return `<path
+  d="M 0 ${totalWidth - scorePosOffset} L ${scorePosOffset} ${totalWidth}
+     M ${scoreNegOffset} ${totalWidth}  L ${totalWidth} ${scoreNegOffset}
+     M ${totalWidth} ${scorePosOffset}  L ${totalWidth - scorePosOffset} 0
+     M ${totalWidth - scoreNegOffset} 0 L 0 ${totalWidth - scoreNegOffset}"
+  style="stroke:black;stroke-width:1;stroke-dasharray:1,2"/>`
+}
 
-  const totalWidth = width + 2 * sideFlap + 2 * margin;
-  const totalHeight = height + topFlap + bottomFlap + 2 * margin;
+function createEnvelopeSVG(width: number, height: number, depth: number): string {
+  const offset = 10
+  const c = Math.SQRT2 / 2 // cos/sin of 45 deg
+  const offsetBoard = 9
+  const totalWidth = 2 * offsetBoard + c * (2 * depth + width + height)
 
-  const svgW = mmToPx(totalWidth);
-  const svgH = mmToPx(totalHeight);
+  const score1 = offset + c * width
+  const score2 = offset + c * (2 * depth + width)
 
-  const startX = mmToPx(margin + sideFlap);
-  const startY = mmToPx(margin + topFlap);
-
-  const cardW = mmToPx(width);
-  const cardH = mmToPx(height);
+  const paperSizeContainer = document.getElementById("paperSize");
+  paperSizeContainer!.innerText = totalWidth.toFixed(0)
+  const score1Container = document.getElementById("score1");
+  score1Container!.innerText = score1.toFixed(0)
+  const score2Container = document.getElementById("score2");
+  score2Container!.innerText = score2.toFixed(0)
 
   return `
-    <svg width="${svgW}" height="${svgH}" xmlns="http://www.w3.org/2000/svg">
-      <rect x="${startX}" y="${startY}" width="${cardW}" height="${cardH}" fill="#e0f7fa" stroke="#006064" stroke-width="2" />
-      <polygon points="
-        ${startX},${startY} 
-        ${startX + cardW},${startY} 
-        ${startX + cardW / 2},${startY - mmToPx(topFlap)}
-      " fill="#b2ebf2" stroke="#006064" stroke-width="1" />
-      <polygon points="
-        ${startX},${startY + cardH} 
-        ${startX + cardW},${startY + cardH} 
-        ${startX + cardW / 2},${startY + cardH + mmToPx(bottomFlap)}
-      " fill="#b2ebf2" stroke="#006064" stroke-width="1" />
-      <polygon points="
-        ${startX},${startY} 
-        ${startX - mmToPx(sideFlap)},${startY + cardH / 2} 
-        ${startX},${startY + cardH}
-      " fill="#b2ebf2" stroke="#006064" stroke-width="1" />
-      <polygon points="
-        ${startX + cardW},${startY} 
-        ${startX + cardW + mmToPx(sideFlap)},${startY + cardH / 2} 
-        ${startX + cardW},${startY + cardH}
-      " fill="#b2ebf2" stroke="#006064" stroke-width="1" />
-    </svg>
-  `;
+<svg viewBox="-${offset} -${offset} ${totalWidth + 2 * offset} ${totalWidth + 2 * offset}" xmlns="http://www.w3.org/2000/svg">
+	<rect width="${totalWidth}" height="${totalWidth}" x="0" y="0" style="fill:blue;stroke:none;fill-opacity:0.1" />
+  ${createPath(totalWidth, score1, offsetBoard)}
+  ${createPath(totalWidth, score2, offsetBoard)}
+</svg>
+  `
 }
 
 document.getElementById("envelopeForm")?.addEventListener("submit", (e) => {
@@ -52,8 +43,9 @@ document.getElementById("envelopeForm")?.addEventListener("submit", (e) => {
 
   const width = parseFloat((document.getElementById("width") as HTMLInputElement).value);
   const height = parseFloat((document.getElementById("height") as HTMLInputElement).value);
+  const depth = parseFloat((document.getElementById("depth") as HTMLInputElement).value);
 
-  const svg = createEnvelopeSVG(width, height);
+  const svg = createEnvelopeSVG(width, height, depth);
   const container = document.getElementById("svgContainer");
   if (container) container.innerHTML = svg;
 });
